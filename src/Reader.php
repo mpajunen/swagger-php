@@ -7,6 +7,10 @@
 namespace Swagger;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Swagger\Processors\DefinitionName;
+use Swagger\Processors\PropertyDescriptionComment;
+use Swagger\Processors\PropertyName;
+use Swagger\Processors\PropertyTypeComment;
 
 class Reader
 {
@@ -37,6 +41,17 @@ class Reader
             array_map($createMethod, $class->getMethods()),
             array_map($createProperty, $class->getProperties())
         );
+
+        $processors = [
+            new DefinitionName(),
+            new PropertyDescriptionComment(),
+            new PropertyName(),
+            new PropertyTypeComment(),
+        ];
+
+        foreach ($processors as $processor) {
+            $processor($annotations);
+        }
 
         return $annotations->getAnnotations();
     }
