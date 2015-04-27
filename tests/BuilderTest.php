@@ -9,7 +9,7 @@ namespace SwaggerTests;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Swagger\Builder;
 
-class BuilderTest extends \PHPUnit_Framework_TestCase
+class BuilderTest extends SwaggerTestCase
 {
     public static function setUpBeforeClass()
     {
@@ -23,6 +23,25 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         $swagger = $builder->parse(__DIR__ . '/Fixtures/Shop');
 
         $this->assertSame($this->getShopExpectedJson(), (string) $swagger);
+    }
+
+    /**
+     * @dataProvider getExamples
+     */
+    public function testExample($exampleDir, $outputFile)
+    {
+        $swagger = (new Builder())->parse(dirname(__DIR__) . '/Examples/' . $exampleDir);
+        $this->assertSwaggerEqualsFile(__DIR__ . '/ExamplesOutput/' . $outputFile, $swagger);
+    }
+
+    public function getExamples()
+    {
+        return [
+            ['petstore.swagger.io', 'petstore.swagger.io.json'],
+            ['swagger-spec/Petstore', 'petstore.json'],
+            ['swagger-spec/PetstoreSimple', 'petstore-simple.json'],
+            ['swagger-spec/PetstoreWithExternalDocs', 'petstore-with-external-docs.json'],
+        ];
     }
 
     private function getShopExpectedJson()
